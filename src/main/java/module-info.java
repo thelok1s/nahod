@@ -4,6 +4,7 @@ module io.lok1s.nahod {
     requires org.kordamp.bootstrapfx.core;
     requires eu.hansolo.tilesfx;
     requires eu.hansolo.applefx;
+    requires eu.hansolo.jdktools;
     requires java.desktop;
     requires javafx.controls;
 

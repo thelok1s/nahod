@@ -1,10 +1,8 @@
 # NAHOD File System Analyzer
 
-<img alt="appicon.png" height="128" src="src/main/resources/assets/appicon.png" width="128"/>
+<img alt="appicon.png" height="256" src="src/main/resources/assets/appicon.png" width="256"/>
 
 **NAHOD** is a file system analyzer built with JavaFX, designed to visually explore and analyze folders and files. Inspired by proprietary macOS Finder, NAHOD offers open-source codebase and a clean, doomer-core UI for viewing files and directories. The application leverages the [AppleFX](https://github.com/HanSolo/AppleFX) library to enhance look and feel on non-mac (cringe) platforms.
-
-## Features
 
 ## Features
 

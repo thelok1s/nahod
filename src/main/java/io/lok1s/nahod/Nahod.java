@@ -17,7 +17,6 @@ import java.util.Objects;
 
 public class Nahod extends Application {
 
-    // Элементы интерфейса и файлы
     private TreeView<File> fileTree;
     private VBox rightPane;
     private MacosCheckBox showHiddenFilesCheckBox;

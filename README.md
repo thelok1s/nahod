@@ -11,7 +11,6 @@
 - **File Metadata**: View detailed metadata for each file, including size, creation date, and author.
 - **Hidden File Toggle**: Show or hide hidden files with an easy-to-use checkbox.
 - **Customizable Dark Theme**: The application uses a macOS-inspired dark theme for an intuitive, visually appealing experience.
-- **On-Demand Loading**: Folders load their contents on expansion, enhancing performance for large directories.
 
 ## Screenshots
 
@@ -25,14 +24,14 @@
 
 ## Installation
 
-_Releases coming soon_
+[Releases page](https://github.com/thelok1s/nahod/releases)
 
 ## Building from Source
 
 ### Prerequisites
 
 - Java Development Kit (JDK) 17 or later
-- Maven (for dependency management)
+- Maven (for dependency management) with JavaFX plugins
 - Ensure `JAVA_HOME` environment variable is set to your JDK installation path.
 - Ensure Gradle is not present in your system as it is garbage.
 
@@ -42,18 +41,22 @@ _Releases coming soon_
    ```bash
    git clone https://github.com/thelok1s/nahod.git
    cd nahod
-
+    ```
+   
 2. **Compile and Package the Application**:
 
    Use Maven to compile and package the application into a JAR file with the required dependencies.
-   mvn clean package
-
+   
+    ```bash
+   mvn clean install
+   mvn javafx:jlink
+    ```
 
 3.	**Run the Application**:
 
       After building, you can run the application with the following command:
       ```bash
-      java -jar target/Nahod.jar
+      java -jar target/app.jar
       ```
    
 **Building with JavaFX Libraries**

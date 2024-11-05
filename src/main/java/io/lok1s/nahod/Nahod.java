@@ -14,9 +14,12 @@ import java.nio.file.Files;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Date;
 import java.util.Objects;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.io.IoBuilder;
 
 public class Nahod extends Application {
-
+    private static final Logger logger = LogManager.getLogger(Nahod.class);
     private TreeView<File> fileTree;
     private VBox rightPane;
     private MacosCheckBox showHiddenFilesCheckBox;
@@ -141,7 +144,7 @@ public class Nahod extends Application {
             Label dateLabel = createStyledLabel("Creation date: " + new Date(attr.creationTime().toMillis()), "date-label");
             rightPane.getChildren().addAll(iconView, nameLabel, sizeLabel, dateLabel);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("An error occurred: ", e);
         }
     }
 
@@ -152,7 +155,7 @@ public class Nahod extends Application {
         placeholderImage.setFitWidth(256);
         placeholderImage.setPreserveRatio(true);
         placeholderImage.setSmooth(true);
-        Label placeholderHeader = createStyledLabel("Welcome to NAHOD v0.1", "placeholder-header");
+        Label placeholderHeader = createStyledLabel("Welcome to NAHOD FS Analyzer", "placeholder-header");
         Label placeholderSubheader = createStyledLabel("Select a file or folder to analyze", "placeholder-subheader");
         rightPane.getChildren().addAll(placeholderImage, placeholderHeader, placeholderSubheader);
     }
@@ -164,6 +167,11 @@ public class Nahod extends Application {
     }
 
     public static void main(String[] args) {
+        System.setOut(IoBuilder.forLogger(logger).buildPrintStream());
+        System.setErr(IoBuilder.forLogger(logger).buildPrintStream());
+
+        logger.info("Application launched");
         launch(args);
+        logger.info("Application closed");
     }
 }

@@ -7,6 +7,8 @@ module io.lok1s.nahod {
     requires eu.hansolo.jdktools;
     requires java.desktop;
     requires javafx.controls;
+    requires org.apache.logging.log4j;
+    requires org.apache.logging.log4j.iostreams;
 
     opens io.lok1s.nahod to javafx.fxml;
     exports io.lok1s.nahod;

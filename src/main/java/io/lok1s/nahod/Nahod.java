@@ -10,6 +10,7 @@ import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import java.io.File;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Date;
@@ -17,15 +18,18 @@ import java.util.Objects;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.io.IoBuilder;
+import org.apache.commons.io.FileUtils;
 
 public class Nahod extends Application {
     private static final Logger logger = LogManager.getLogger(Nahod.class);
     private TreeView<File> fileTree;
     private VBox rightPane;
     private MacosCheckBox showHiddenFilesCheckBox;
+    private MacosTextField fieldTreePath;
     private final Image folderIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/assets/folder-icon-alt.png")));
     private final Image fileIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/assets/file-icon.png")));
     private final Image appIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/assets/appicon.png")));
+    private final Image errorIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/assets/error.png")));
 
     @Override
     public void start(Stage primaryStage) {
@@ -53,27 +57,54 @@ public class Nahod extends Application {
         VBox leftPane = new VBox(5);
         leftPane.getStyleClass().add("left-pane");
         showHiddenFilesCheckBox = createShowHiddenFilesCheckBox();
-        fileTree = new TreeView<>();
-        fileTree.setRoot(createFileTree(new File(System.getProperty("user.home"))));
-        fileTree.setShowRoot(true);
-        fileTree.getStyleClass().add("file-tree");
-        fileTree.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
+        fieldTreePath = createPathField();
+        fileTree = treeBuilder();
+        leftPane.getChildren().addAll(fieldTreePath, fileTree, showHiddenFilesCheckBox);
+        return leftPane;
+    }
+
+    private TreeView<File> treeBuilder() {
+        TreeView<File> treeView = new TreeView<>();
+        if (fieldTreePath.getText().isEmpty() || fieldTreePath.getText().equals(" ")) {
+            treeView.setRoot(createFileTree(new File(System.getProperty("user.home"))));
+        } else {
+            treeView.setRoot(createFileTree(new File(fieldTreePath.getText())));
+        }
+        treeView.setShowRoot(true);
+        treeView.getStyleClass().add("file-tree");
+        treeView.getSelectionModel().selectedItemProperty().addListener((_, _, newSelection) -> {
             if (newSelection != null) {
                 showFileInfo(newSelection.getValue());
             } else {
                 setPlaceholder();
             }
         });
-        leftPane.getChildren().addAll(showHiddenFilesCheckBox, fileTree);
-        return leftPane;
+        return treeView;
     }
 
     private MacosCheckBox createShowHiddenFilesCheckBox() {
         MacosCheckBox checkBox = new MacosCheckBox("Show Hidden Files");
         checkBox.setSelected(false);
         checkBox.getStyleClass().add("check-box");
-        checkBox.selectedProperty().addListener((obs, oldVal, newVal) -> refreshFileTree());
+        checkBox.selectedProperty().addListener((_, _, _) -> refreshFileTree());
         return checkBox;
+    }
+
+    private MacosTextField createPathField() {
+        MacosTextField pathField = new MacosTextField();
+        pathField.setPromptText("Path to analyze (home by default)");
+        pathField.getStyleClass().add("path-field");
+        pathField.setOnAction(_ -> {
+            File dir = new File(pathField.getText());
+            if (dir.isDirectory()) {
+                fileTree.setRoot(createFileTree(dir));
+            } else if (Objects.equals(pathField.getText(), "")) {
+                fileTree.setRoot(createFileTree(new File(System.getProperty("user.home"))));
+            } else {
+                logger.error("Path \"{}\" does not exist or not available", pathField.getText());
+            }
+        });
+        return pathField;
     }
 
     private void refreshFileTree() {
@@ -104,7 +135,7 @@ public class Nahod extends Application {
     }
 
     private void setupLazyLoading(TreeItem<File> item, File file) {
-        item.expandedProperty().addListener((obs, wasExpanded, isNowExpanded) -> {
+        item.expandedProperty().addListener((_, _, isNowExpanded) -> {
             if (isNowExpanded && item.getChildren().size() == 1 && item.getChildren().getFirst().getValue() == null) {
                 item.getChildren().clear();
                 for (File child : Objects.requireNonNull(file.listFiles())) {
@@ -137,27 +168,48 @@ public class Nahod extends Application {
         iconView.getStyleClass().add("icon");
 
         Label nameLabel = createStyledLabel("Name: " + file.getName(), "name-label");
-        Label sizeLabel = createStyledLabel("Size: " + (file.isFile() ? file.length() + " bytes" : "Directory"), "size-label");
+        Label sizeLabel;
 
         try {
+            if (file.isDirectory()) {
+                long folderSize = FileUtils.sizeOfDirectory(file);
+                sizeLabel = createStyledLabel("Size: " + FileUtils.byteCountToDisplaySize(folderSize), "size-label");
+            } else {
+                sizeLabel = createStyledLabel("Size: " + FileUtils.byteCountToDisplaySize(file.length()), "size-label");
+            }
             BasicFileAttributes attr = Files.readAttributes(file.toPath(), BasicFileAttributes.class);
-            Label dateLabel = createStyledLabel("Creation date: " + new Date(attr.creationTime().toMillis()), "date-label");
-            rightPane.getChildren().addAll(iconView, nameLabel, sizeLabel, dateLabel);
+            Label createdDateLabel = createStyledLabel("Creation date: " + new Date(attr.creationTime().toMillis()), "date-label");
+            Label modifiedDateLabel = createStyledLabel("Last modification date: " + new Date(attr.lastModifiedTime().toMillis()), "date-label");
+            rightPane.getChildren().addAll(iconView, nameLabel, sizeLabel, createdDateLabel, modifiedDateLabel);
         } catch (IOException e) {
-            logger.error("An error occurred: ", e);
+            logger.error(e);
+        } catch (UncheckedIOException e) {
+            logger.error("Cannot access {}", file);
+            setErrorAlert();
         }
     }
 
-    private void setPlaceholder() {
+    private void setPlaceholderContent(Image icon, String headerText, String subheaderText) {
         rightPane.getChildren().clear();
-        ImageView placeholderImage = new ImageView(appIcon);
+
+        ImageView placeholderImage = new ImageView(icon);
         placeholderImage.setFitHeight(256);
         placeholderImage.setFitWidth(256);
         placeholderImage.setPreserveRatio(true);
         placeholderImage.setSmooth(true);
-        Label placeholderHeader = createStyledLabel("Welcome to NAHOD FS Analyzer", "placeholder-header");
-        Label placeholderSubheader = createStyledLabel("Select a file or folder to analyze", "placeholder-subheader");
+
+        Label placeholderHeader = createStyledLabel(headerText, "placeholder-header");
+        Label placeholderSubheader = createStyledLabel(subheaderText, "placeholder-subheader");
+
         rightPane.getChildren().addAll(placeholderImage, placeholderHeader, placeholderSubheader);
+    }
+
+    private void setPlaceholder() {
+        setPlaceholderContent(appIcon, "Welcome to NAHOD v1.0", "Select a file or folder to analyze");
+    }
+
+    private void setErrorAlert() {
+        setPlaceholderContent(errorIcon, "No access", "Check permissions and try again");
     }
 
     private Label createStyledLabel(String text, String styleClass) {

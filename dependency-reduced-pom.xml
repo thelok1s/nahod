@@ -4,7 +4,7 @@
   <groupId>io.lok1s</groupId>
   <artifactId>nahod</artifactId>
   <name>nahod</name>
-  <version>0.1.0-prerelease</version>
+  <version>1.0-release</version>
   <build>
     <plugins>
       <plugin>

@@ -72,7 +72,7 @@ public class Nahod extends Application {
         }
         treeView.setShowRoot(true);
         treeView.getStyleClass().add("file-tree");
-        treeView.getSelectionModel().selectedItemProperty().addListener((_, _, newSelection) -> {
+        treeView.getSelectionModel().selectedItemProperty().addListener((observable, oldSelection, newSelection) -> {
             if (newSelection != null) {
                 showFileInfo(newSelection.getValue());
             } else {
@@ -86,7 +86,7 @@ public class Nahod extends Application {
         MacosCheckBox checkBox = new MacosCheckBox("Show Hidden Files");
         checkBox.setSelected(false);
         checkBox.getStyleClass().add("check-box");
-        checkBox.selectedProperty().addListener((_, _, _) -> refreshFileTree());
+        checkBox.selectedProperty().addListener((observable, oldValue, newValue) -> refreshFileTree());
         return checkBox;
     }
 
@@ -94,7 +94,7 @@ public class Nahod extends Application {
         MacosTextField pathField = new MacosTextField();
         pathField.setPromptText("Path to analyze (home by default)");
         pathField.getStyleClass().add("path-field");
-        pathField.setOnAction(_ -> {
+        pathField.setOnAction(event -> {
             File dir = new File(pathField.getText());
             if (dir.isDirectory()) {
                 fileTree.setRoot(createFileTree(dir));
@@ -135,8 +135,8 @@ public class Nahod extends Application {
     }
 
     private void setupLazyLoading(TreeItem<File> item, File file) {
-        item.expandedProperty().addListener((_, _, isNowExpanded) -> {
-            if (isNowExpanded && item.getChildren().size() == 1 && item.getChildren().getFirst().getValue() == null) {
+        item.expandedProperty().addListener((observable, oldValue, isNowExpanded) -> {
+            if (isNowExpanded && item.getChildren().size() == 1 && item.getChildren().get(0).getValue() == null) {
                 item.getChildren().clear();
                 for (File child : Objects.requireNonNull(file.listFiles())) {
                     if (!showHiddenFilesCheckBox.isSelected() && child.isHidden()) {

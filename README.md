@@ -6,11 +6,15 @@
 
 ## Features
 
-- **Directory Analysis**: Analyze specified directories and files, displaying their names, disk space usage, creation dates, and creator information.
-- **Tree View Interface**: Explore directories and files in a tree-like structure, similar to the Windows Registry editor, with expandable folders.
-- **File Metadata**: View detailed metadata for each file, including size, creation date, and author.
-- **Hidden File Toggle**: Show or hide hidden files with an easy-to-use checkbox.
-- **Customizable Dark Theme**: The application uses a macOS-inspired dark theme for an intuitive, visually appealing experience.
+- **Directory and File Analysis:** NAHOD enables users to analyze specified directories and files, displaying information such as names, sizes, creation dates, and file metadata
+
+- **Tree View Navigation:** Explore directories and files in a tree-like structure, similar to traditional file explorers, with expandable folders and hierarchical organization
+
+- **File Metadata:** View comprehensive metadata for each file, including size, creation date, modification date, and more
+
+- **Hidden Files Toggle:** Easily toggle the visibility of hidden files to suit your needs
+
+- **Cross-Platform Compatibility:** NAHOD works seamlessly across different platforms including Windows, macOS, and Linux, offering a consistent and smooth user experience
 
 ## Screenshots
 
@@ -19,55 +23,58 @@
 ## Prerequisites
 
 - **Java 11 or higher**: The application is built with JavaFX, which requires at least Java 11.
-- **Maven**: Used for dependency management and building the project.
-
 
 ## Installation
 
-[Releases page](https://github.com/thelok1s/nahod/releases)
+See [Releases page](https://github.com/thelok1s/nahod/releases)
 
 ## Building from Source
 
-### Prerequisites
+This project uses Gradle to build and package the application. It utilizes several plugins to manage dependencies, create a custom JAR with a modular approach, and package the application as an installer for different platforms.
 
-- Java Development Kit (JDK) 17 or later
-- Maven (for dependency management) with JavaFX plugins
-- Ensure `JAVA_HOME` environment variable is set to your JDK installation path.
-- Ensure Gradle is not present in your system as it is garbage.
+### Requirements
 
-### Steps to Build
+- JDK 21 
+- Gradle 8.5 or newer
 
-1. **Clone the Repository**:
-   ```bash
-   git clone https://github.com/thelok1s/nahod.git
-   cd nahod
-    ```
-   
-2. **Compile and Package the Application**:
+### Build
 
-   Use Maven to compile and package the application into a JAR file with the required dependencies.
-   
-    ```bash
-   mvn clean install
-   mvn javafx:jlink
-    ```
+To build the application, use the following Gradle command:
 
-3.	**Run the Application**:
+`./gradlew clean build`
 
-      After building, you can run the application with the following command:
-      ```bash
-      java -jar target/app.jar
-      ```
-   
-**Building with JavaFX Libraries**
+### This will:
+- Compile the source code
+- Generate a JAR file
+- Package the application with necessary dependencies
 
-If JavaFX libraries are not bundled in your JDK, ensure you include JavaFX SDK in your pom.xml dependencies. Additionally, add --module-path and --add-modules javafx.controls,javafx.fxml to the command line when running.
+Running the Application
 
-Important Notes
+To run the application, use:
 
-	•	Asset Files: Ensure the assets folder with required icons (folder-icon.png, file-icon.png, and appicon.png) is available in the src/main/resources directory.
-	•	Stylesheet: Ensure styles.css file is located in src/main/resources to apply the application’s theme.
+`./gradlew run`
 
-This will build a .jar file named NahodFileManager.jar in the target directory, ready for distribution.
+This command will run the main class defined in the application plugin configuration (io.lok1s.nahod.MainLauncher).
 
-This section includes cloning, building, and running instructions tailored to your project structure and dependencies. You can adapt the repository URL and file names to match your setup.
+### Creating a Modular JAR
+
+This project uses the jlink and [badass-jlink](https://github.com/beryx/badass-jlink-plugin) plugin to create modular JAR. To generate a JAR file, run:
+
+`./gradlew jlink`
+
+### Creating a Shadow (Fat) JAR
+
+This project also supports creating a fat (shadow) JAR using the shadowJar task. To generate a fat JAR file, run:
+
+`./gradlew shadowJar`
+
+This will bundle the application and its dependencies into a single JAR file located in the build/libs directory. 
+
+### Creating an Installer
+
+jpackage plugin could be used to create an installer for different platforms.
+_Current jpackage configuration was not used on production, so it might need some adjustments. Check build.gradle for further information._
+To create an installer, run:
+
+`./gradlew jpackage`
+

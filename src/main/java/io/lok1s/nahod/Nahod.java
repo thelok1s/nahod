@@ -205,7 +205,7 @@ public class Nahod extends Application {
     }
 
     private void setPlaceholder() {
-        setPlaceholderContent(appIcon, "Welcome to NAHOD v1.0", "Select a file or folder to analyze");
+        setPlaceholderContent(appIcon, "Welcome to NAHOD v1.1", "Select a file or folder to analyze");
     }
 
     private void setErrorAlert() {

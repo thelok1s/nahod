@@ -3,7 +3,6 @@ target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
-*.log
 
 ### IntelliJ IDEA ###
 .idea/
@@ -47,3 +46,9 @@ build/
 
 ### Other ###
 out/
+
+### Ignore Gradle project-specific cache directory ###
+.gradle
+
+### Ignore Gradle build output directory ###
+build

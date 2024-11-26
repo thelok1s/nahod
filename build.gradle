@@ -41,6 +41,11 @@ tasks.withType(Javadoc) {
     options.encoding = 'UTF-8'
 }
 
+task javadoc(type: Javadoc) {
+    source = sourceSets.main.allJava
+    destinationDir = file("${buildDir}/docs/javadoc")
+}
+
 javafx {
     version = 21
     modules = ['javafx.controls', 'javafx.fxml']

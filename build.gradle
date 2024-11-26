@@ -37,13 +37,13 @@ tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
 }
 
-tasks.withType(Javadoc) {
+tasks.withType(Javadoc).configureEach {
     options.encoding = 'UTF-8'
 }
 
-task javadoc(type: Javadoc) {
+tasks.register('javadoc', Javadoc) {
     source = sourceSets.main.allJava
-    destinationDir = file("${buildDir}/docs/javadoc")
+    destinationDir = layout.buildDirectory.dir("docs/javadoc").get().asFile
 }
 
 javafx {

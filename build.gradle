@@ -41,7 +41,7 @@ tasks.withType(Javadoc).configureEach {
     options.encoding = 'UTF-8'
 }
 
-tasks.register('javadoc', Javadoc) {
+javadoc {
     source = sourceSets.main.allJava
     destinationDir = layout.buildDirectory.dir("docs/javadoc").get().asFile
 }

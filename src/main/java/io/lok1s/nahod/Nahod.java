@@ -20,6 +20,9 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.io.IoBuilder;
 import org.apache.commons.io.FileUtils;
 
+/**
+ * Основной класс приложения javafx.
+ */
 public class Nahod extends Application {
     private static final Logger logger = LogManager.getLogger(Nahod.class);
     private TreeView<File> fileTree;
@@ -31,6 +34,12 @@ public class Nahod extends Application {
     private final Image appIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/assets/appicon.png")));
     private final Image errorIcon = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/assets/error.png")));
 
+    /**
+     * Точка входа в приложение javafx.
+     * Инициализирует главное окно и загружает основной макет.
+     *
+     * @param primaryStage Главное окно приложения.
+     */
     @Override
     public void start(Stage primaryStage) {
         primaryStage.setTitle("NAHOD File System Analyzer");
@@ -42,6 +51,11 @@ public class Nahod extends Application {
         primaryStage.show();
     }
 
+    /**
+     * Создает основной макет приложения с разделителем.
+     *
+     * @return Главный контейнер SplitPane.
+     */
     private SplitPane createMainLayout() {
         SplitPane root = new SplitPane();
         root.getStyleClass().add("split-pane");
@@ -53,6 +67,11 @@ public class Nahod extends Application {
         return root;
     }
 
+    /**
+     * Создает левую панель с элементами управления и деревом файлов.
+     *
+     * @return Контейнер VBox с элементами управления.
+     */
     private VBox createLeftPane() {
         VBox leftPane = new VBox(5);
         leftPane.getStyleClass().add("left-pane");
@@ -63,6 +82,11 @@ public class Nahod extends Application {
         return leftPane;
     }
 
+    /**
+     * Создает дерево файловой системы.
+     *
+     * @return Компонент TreeView для отображения дерева файлов.
+     */
     private TreeView<File> treeBuilder() {
         TreeView<File> treeView = new TreeView<>();
         if (fieldTreePath.getText().isEmpty() || fieldTreePath.getText().equals(" ")) {
@@ -82,6 +106,11 @@ public class Nahod extends Application {
         return treeView;
     }
 
+    /**
+     * Создает флажок для отображения скрытых файлов.
+     *
+     * @return Компонент MacosCheckBox.
+     */
     private MacosCheckBox createShowHiddenFilesCheckBox() {
         MacosCheckBox checkBox = new MacosCheckBox("Show Hidden Files");
         checkBox.setSelected(false);
@@ -90,6 +119,11 @@ public class Nahod extends Application {
         return checkBox;
     }
 
+    /**
+     * Создает поле ввода пути к каталогу.
+     *
+     * @return Компонент MacosTextField для ввода пути.
+     */
     private MacosTextField createPathField() {
         MacosTextField pathField = new MacosTextField();
         pathField.setPromptText("Path to analyze (home by default)");
@@ -107,10 +141,20 @@ public class Nahod extends Application {
         return pathField;
     }
 
+
+    /**
+     * Обновляет дерево файлов с учетом текущего пути.
+     */
     private void refreshFileTree() {
         fileTree.setRoot(createFileTree(new File(System.getProperty("user.home"))));
     }
 
+    /**
+     * Создает дерево файлов для указанного каталога.
+     *
+     * @param dir Корневой каталог.
+     * @return Корневой элемент дерева.
+     */
     private TreeItem<File> createFileTree(File dir) {
         TreeItem<File> root = createTreeItem(dir);
         root.setExpanded(true);
@@ -134,6 +178,12 @@ public class Nahod extends Application {
         return root;
     }
 
+    /**
+     * Настраивает ленивую загрузку содержимого папки.
+     *
+     * @param item Элемент дерева.
+     * @param file Файл или папка.
+     */
     private void setupLazyLoading(TreeItem<File> item, File file) {
         item.expandedProperty().addListener((observable, oldValue, isNowExpanded) -> {
             if (isNowExpanded && item.getChildren().size() == 1 && item.getChildren().get(0).getValue() == null) {
@@ -148,6 +198,12 @@ public class Nahod extends Application {
         });
     }
 
+    /**
+     * Создает элемент дерева для файла или папки.
+     *
+     * @param file Файл или папка.
+     * @return Элемент TreeItem.
+     */
     private TreeItem<File> createTreeItem(File file) {
         ImageView iconView = new ImageView(file.isDirectory() ? folderIcon : fileIcon);
         iconView.setFitHeight(16);
@@ -158,6 +214,11 @@ public class Nahod extends Application {
         return new TreeItem<>(file, iconView);
     }
 
+    /**
+     * Отображает информацию о выбранном файле.
+     *
+     * @param file Файл или папка.
+     */
     private void showFileInfo(File file) {
         rightPane.getChildren().clear();
         ImageView iconView = new ImageView(file.isDirectory() ? folderIcon : fileIcon);
@@ -189,6 +250,10 @@ public class Nahod extends Application {
         }
     }
 
+
+    /**
+     * Устанавливает контент панели в правой части интерфейса.
+     */
     private void setPlaceholderContent(Image icon, String headerText, String subheaderText) {
         rightPane.getChildren().clear();
 
@@ -204,20 +269,39 @@ public class Nahod extends Application {
         rightPane.getChildren().addAll(placeholderImage, placeholderHeader, placeholderSubheader);
     }
 
+    /**
+     * Устанавливает информационную панель в правой части интерфейса.
+     */
     private void setPlaceholder() {
         setPlaceholderContent(appIcon, "Welcome to NAHOD v1.1", "Select a file or folder to analyze");
     }
 
+    /**
+     * Устанавливает панель ошибки в правой части интерфейса.
+     */
     private void setErrorAlert() {
         setPlaceholderContent(errorIcon, "No access", "Check permissions and try again");
     }
 
+    /**
+     * Создает стилизованный элемент.
+     *
+     * @param text Текст метки.
+     * @param styleClass Класс стилей.
+     * @return Объект Label.
+     */
     private Label createStyledLabel(String text, String styleClass) {
         Label label = new Label(text);
         label.getStyleClass().add(styleClass);
         return label;
     }
 
+
+    /**
+     * Запуск приложения.
+     *
+     * @param args Аргументы командной строки.
+     */
     public static void main(String[] args) {
         System.setOut(IoBuilder.forLogger(logger).buildPrintStream());
         System.setErr(IoBuilder.forLogger(logger).buildPrintStream());
